@@ -19,11 +19,11 @@ recent sale, I'll include the creation/upload script for that too.
 others.
 
 
-### The client/actor (terminology?)
+### The server/actor (terminology?)
 
 - It'll be constructed in python 3.  It's a particularly clean and 
 understandable language to program in.
-- The Flask library/api makes creating a web client really easy.
+- The Flask library/api makes creating a web API really easy.
 - Google App Engine, on which it will be deployed, supports python and 
 flask without issues.
 - Note to other people on the course;  This part doesn't really do 
@@ -38,9 +38,20 @@ how to program this yet.
 
 ## Resources
 
-The tutorial that taught me to create a RESTful API client/actor is 
+
+### For creating the API server
+The tutorial that taught me to create a RESTful API server/actor is 
 at https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 
 The example I created following this is in example_app.py but if you 
 plan to create this service using python I recommend following the 
 original tutorial.
+
+
+### For creating the GUI
+The tricky part is making the requests over http from the GUI (in html,
+with JavaScript code) to the server.  The tutorial I've followed in 
+making my example can be found at https://www.taniarascia.com/how-to-connect-to-an-api-with-javascript/
+
+The example I've created is in example_gui.html, and will connect to the
+example_app.py if running.
