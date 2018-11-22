@@ -1,1 +1,46 @@
 # Buyer's App
+
+## Whats the plan?
+
+I'm creating a web app, powered by three components.  In the background 
+will be a mongoDB hosting data on houses for sale.  Handling the 
+requests for data will be an actor/service, created using Flask in 
+python.  The interface the user sees will be a JavaScript-powered web 
+page.  The system will use RESTful API's to handle client-actor 
+interractions through http requests.
+
+
+### The database
+
+- Initially, it'll be a local mongoDB instance.
+- It'll be created by fudging some HMRC data on property prices for 
+recent sale, I'll include the creation/upload script for that too.
+- The DB will be moved to the web ASAP, so that it can be shared with 
+others.
+
+
+### The client/actor (terminology?)
+
+- It'll be constructed in python 3.  It's a particularly clean and 
+understandable language to program in.
+- The Flask library/api makes creating a web client really easy.
+- Google App Engine, on which it will be deployed, supports python and 
+flask without issues.
+- Note to other people on the course;  This part doesn't really do 
+anything different to the Java examples Hong shared with us!
+
+
+### The frontend/GUI/webpage
+
+- Javascript should support RESTful services but I don't actually know 
+how to program this yet.
+
+
+## Resources
+
+The tutorial that taught me to create a RESTful API client/actor is 
+at https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
+
+The example I created following this is in example_app.py but if you 
+plan to create this service using python I recommend following the 
+original tutorial.
