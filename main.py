@@ -2,6 +2,8 @@
 
 # My Example to-do list application
 
+# [START gae_python37_app]
+
 # Flask bits
 from flask import Flask, jsonify, abort, request, make_response, url_for
 
@@ -113,4 +115,9 @@ def not_found(error):
 	 	
 
 if __name__ == '__main__':
-	app.run(debug=True)
+    # This is used when running locally only. When deploying to Google App
+    # Engine, a webserver process such as Gunicorn will serve the app. This
+    # can be configured by adding an `entrypoint` to app.yaml.
+    app.run(host='127.0.0.1', port=8080, debug=True)
+    
+# [END gae_python37_app]
