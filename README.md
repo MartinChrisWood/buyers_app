@@ -26,14 +26,11 @@ understandable language to program in.
 - The Flask library/api makes creating a web API really easy.
 - Google App Engine, on which it will be deployed, supports python and 
 flask without issues.
-- Note to other people on the course;  This part doesn't really do 
-anything different to the Java examples Hong shared with us!
 
 
 ### The frontend/GUI/webpage
 
-- Javascript should support RESTful services but I don't actually know 
-how to program this yet.
+- On different repo, see;  
 
 
 ## Resources
