@@ -17,11 +17,9 @@ def make_public_property(house):
 	new_house = {}
 	
 	for field in house:
+		new_house[field] = house[field]
 		if field == 'id':
 			new_house['uri'] = url_for('get_property', property_id=house['id'], _external=True)
-		else:
-			new_house[field] = house[field]
-	
 	return new_house
 
 
