@@ -12,6 +12,8 @@
 # below:
 .git
 .gitignore
+main_old.py
+test_mongo_connection.py
 
 # Python pycache:
 __pycache__/

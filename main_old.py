@@ -7,47 +7,57 @@
 # Flask bits
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS
-import pymongo
 
-# Set up the app
 app = Flask(__name__)
-
-# Set up CORS (allow from anywhere)
 CORS(app)
 
-# Set up the database connection
-MONGO_HOST = "35.187.119.75"
-MONGO_DB = "properties"
 
-# Connect to the database
-cl = pymongo.MongoClient(MONGO_HOST + ":27017")
-db = cl['ryanprop']
-col = db['properties']
+# Helper function, create a full URI for a property
+def make_public_property(house):
+	new_house = {}
+	
+	for field in house:
+		new_house[field] = house[field]
+		if field == 'id':
+			new_house['uri'] = url_for('get_property', property_id=house['id'], _external=True)
+	return new_house
 
 
+# Some fake properties, stored in-memory rather than in an external DB for now
+houses = [
+			{"id":1,
+			 "title": u"Fine 1 bed Flat for Sale!",
+			 "address": u"Flat 15, Empress Gardens, Manor Farm Road,  Southampton",
+			 "postcode": u"SO31 2FQ",
+			 "description": u"Spacious first floor one-bed flat with minor niffler infestation.",
+			 "sold": False},
+			{"id":2,
+			 "title": u"15 Room Mansion going Cheap!",
+			 "address": u"Fancy-pants Road, Posh-sods Town, UK",
+			 "postcode": u"IS5 2GD",
+			 "description": "Gigantic mansion, excellent kitchen, may contain Nigel Farage or relatives.",
+			 "sold":False}
+		    ]
+	
+	
 @app.route('/properties', methods=['GET'])
 def get_properties():
-	
-	# Get the properties data, drop object ID's (they don't jsonify...)
-	houses = [{key:value for key, value in house.items() if key != "_id"} for house in col.find()]
-	
-	# Return the properties after appending URI data
-	return( jsonify({'properties': houses}) )
+	return( jsonify({'properties': [make_public_property(house) for house in houses]}) )
 
 
 @app.route('/properties/<int:property_id>', methods=['GET'])
 def get_property(property_id):
 	
-	# Filters list of results to the property with matching id number
-	house = col.find_one({"id":property_id})
-	
-	house.pop("_id")
+	# Filters list of results to properties with matching id number
+	house = [house for house in houses if house['id'] == property_id]
 	
 	# If there's no results, abort and return "not found" HTTP response code
 	if len(house) == 0:
 		abort(404)
 	
-	return( jsonify({'property': house}) )
+	# Weird quirk, line below will only return the first result in the
+	# case that there are multiple matches...	
+	return( jsonify({'property': house[0]}) )
 	
 	
 @app.route('/properties', methods=['POST'])
@@ -63,7 +73,7 @@ def create_property():
 			 'description': request.json.get('description', ""),
 			 'sold': False}
 	
-	col.insert(house)
+	houses.append(house)
 	return( jsonify({'property': house}), 201 )
 
 
@@ -113,6 +123,9 @@ def not_found(error):
 	 	
 
 if __name__ == '__main__':
+    # This is used when running locally only. When deploying to Google App
+    # Engine, a webserver process such as Gunicorn will serve the app. This
+    # can be configured by adding an `entrypoint` to app.yaml.
     app.run(host='127.0.0.1', port=8080, debug=True)
     
 # [END gae_python37_app]
