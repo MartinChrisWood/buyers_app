@@ -1,6 +1,6 @@
 #!flask/bin/python
 
-# My Example to-do list application
+# RESTful properties web service
 
 # [START gae_python37_app]
 
@@ -56,7 +56,7 @@ def create_property():
 	if not request.json or not 'title' in request.json:
 		abort(400)
 	
-	house = {'id': houses[-1]['id'] + 1,
+	house = {'id': col.find.count() + 1,
 			 'title': request.json['title'],
 			 'address': request.json.get('address', ""),
 			 'postcode': request.json.get('postcode', ""),
@@ -69,7 +69,9 @@ def create_property():
 
 @app.route('/properties/<int:property_id>', methods=['PUT'])
 def update_property(property_id):
-	house = [house for house in houses if house['id'] == property_id]
+
+	# Filters list of results to the property with matching id number
+	house = col.find_one({"id":property_id})
 	
 	if len(house) == 0:
 		abort(404)
@@ -86,21 +88,30 @@ def update_property(property_id):
 	if 'sold' in request.json and type(request.json['sold']) is not bool:
 		abort(400)
 	
-	house[0]['title'] = request.json.get('title', house[0]['title'])
-	house[0]['address'] = request.json.get('address', house[0]['address'])
-	house[0]['postcode'] = request.json.get('postcode', house[0]['postcode'])
-	house[0]['description'] = request.json.get('description', house[0]['description'])
-	house[0]['done'] = request.json.get('sold', house[0]['sold'])
+	house['title'] = request.json.get('title', house[0]['title'])
+	house['address'] = request.json.get('address', house[0]['address'])
+	house['postcode'] = request.json.get('postcode', house[0]['postcode'])
+	house['description'] = request.json.get('description', house[0]['description'])
+	house['done'] = request.json.get('sold', house[0]['sold'])
 	
-	return jsonify({'house': house[0]})
+	# Update the database
+	col.update({"id":property_id}, house)
+	
+	return jsonify({'house': house})
 
 
 @app.route('/properties/<int:property_id>', methods=['DELETE'])
 def delete_property(property_id):
-	house = [house for house in houses if house['id'] == property_id]
+
+	# Filters list of results to the property with matching id number
+	house = col.find_one({"id":property_id})
+	
 	if len(house) == 0:
 		abort(404)
-	houses.remove(house[0])
+	
+	# Delete record from the database
+	col.delete({"_id":house["_id"]})
+	
 	return jsonify({'result': True})
 	
 
@@ -110,7 +121,7 @@ def delete_property(property_id):
 @app.errorhandler(404)
 def not_found(error):
 	return make_response(jsonify({'error': 'Not found'}), 404)
-	 	
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
