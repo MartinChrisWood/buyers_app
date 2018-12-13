@@ -120,7 +120,7 @@ def delete_property(property_id):
 		abort(404)
 	
 	# Delete record from the database
-	col.delete({"_id":house["_id"]})
+	col.delete_many({"_id":house["_id"]})
 	
 	return jsonify({'result': True})
 	
