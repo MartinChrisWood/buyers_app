@@ -8,6 +8,8 @@
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS
 import pymongo
+import json
+import re
 
 # Set up the app
 app = Flask(__name__)
@@ -53,17 +55,24 @@ def get_property(property_id):
 @app.route('/properties', methods=['POST'])
 def create_property():
 	
-	if not request.json or not 'title' in request.json:
+	data = json.loads( request.data.decode("utf-8").replace("'", '"') )
+	
+	try:
+		house = {'id': col.find().count() + 1,
+				'title': data['title'],
+				'address': data['address'],
+				'postcode': data['postcode'],
+				'description': data['description'],
+				'sold': False}
+	
+		col.insert(house)
+	
+	except Exception as e:
+		print(e)
 		abort(400)
 	
-	house = {'id': col.find.count() + 1,
-			 'title': request.json['title'],
-			 'address': request.json.get('address', ""),
-			 'postcode': request.json.get('postcode', ""),
-			 'description': request.json.get('description', ""),
-			 'sold': False}
+	house.pop('_id')
 	
-	col.insert(house)
 	return( jsonify({'property': house}), 201 )
 
 
@@ -73,27 +82,28 @@ def update_property(property_id):
 	# Filters list of results to the property with matching id number
 	house = col.find_one({"id":property_id})
 	
+	# Parse new data from the request
+	data = json.loads( request.data.decode("utf-8").replace("'", '"') )
+	
 	if len(house) == 0:
 		abort(404)
-		
-	if not request.json:
-		abort(400)
 	
-	if 'title' in request.json and type(request.json['title']) is not unicode:
+	if 'title' in data and type(data['title']) is not unicode:
 		abort(400)
 		
-	if 'description' in request.json and type(request.json['description']) is not unicode:
+	if 'description' in data and type(data['description']) is not unicode:
 		abort(400)
 			
-	if 'sold' in request.json and type(request.json['sold']) is not bool:
+	if 'sold' in data and type(data['sold']) is not bool:
 		abort(400)
 	
-	house['title'] = request.json.get('title', house[0]['title'])
-	house['address'] = request.json.get('address', house[0]['address'])
-	house['postcode'] = request.json.get('postcode', house[0]['postcode'])
-	house['description'] = request.json.get('description', house[0]['description'])
-	house['done'] = request.json.get('sold', house[0]['sold'])
+	for each in data.keys():
+		try:
+			house[each] = data[each]
 	
+		except:
+			pass
+		
 	# Update the database
 	col.update({"id":property_id}, house)
 	
